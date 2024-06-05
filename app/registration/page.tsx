@@ -62,7 +62,7 @@ export default function Registration() {
         <AppContext.Consumer>
             {({ defaultPattern, defaultPatterns, playerPatterns, makeSwitch, makeSwitchToo, playerOneSwitch, playerTwoSwitch, resetDefault, playerOnePattern, playerTwoPattern, playerOnePatternError }) => {
                 return (
-                    <main className="flex min-h-screen w-[100%] items-start justify-center gap-[20px] p-4">
+                    <main className="flex flex-col min-h-screen w-[100%] items-start justify-center gap-[20px] p-4">
                         <form className="flex w-[400px] borde p-2 flex-col gap-[30px]">
                             <label htmlFor="name">NAME</label>
                             <input onChange={(e) => { handleChange(e) }} value={formData.name} name="name" className="outline-none border w-full" />
@@ -87,7 +87,7 @@ export default function Registration() {
                                 done()
                             }}
                         >
-                            Download Attendance
+                            <button className="border font-[600] p-2 rounded-[10px] border-[3px]">Download Attendance</button>
                         </CSVLink>
                     </main>
                 )
