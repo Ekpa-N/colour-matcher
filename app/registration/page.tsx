@@ -2,14 +2,14 @@
 import Image from "next/image";
 import ColourMatcher from "@/components/ColourMatcher";
 import AppContext from "@/components/Provider";
-import { ReactEventHandler, ReactHTMLElement } from "react";
+import { ReactEventHandler, ReactHTMLElement, useEffect } from "react";
 import { useState } from "react";
 import { db } from '../../firebase/index'
 import { CSVLink } from "react-csv";
 import { collection, addDoc, getDocs, limit, query, where, doc, updateDoc, setDoc, getDoc, startAt, startAfter, getCountFromServer, serverTimestamp, endBefore, onSnapshot } from "firebase/firestore";
 
 export default function Registration() {
-    const [formData, setFormData] = useState<{ name: string, center: string, phone: string, email:"" }>({ name: "", center: "", phone: "", email:"" })
+    const [formData, setFormData] = useState<{ name: string, center: string, phone: string, email: "" }>({ name: "", center: "", phone: "", email: "" })
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [attendance, setAttendance] = useState<any>([])
 
@@ -17,7 +17,22 @@ export default function Registration() {
         { label: "Name", key: "name" },
         { label: "Center", key: "center" },
         { label: "Phone", key: "phone" },
+        { label: "email", key: "email" }
     ]
+
+    useEffect(()=>{
+        const fetchData = async () => {
+            const querySnapshot = await getDocs(collection(db, "registration"));
+            const data: any = []
+            querySnapshot.forEach((doc) => {
+                data.push({ name: doc.data().name, center: doc.data().center, phone: addSpaceEveryThreeCharacters(doc.data().phone.toString()), email: doc.data().email })
+            });
+            // debugger
+            setAttendance(data)
+        }
+
+        fetchData()
+    },[])
 
     async function handleSubmit(e: any) {
         e.preventDefault()
@@ -35,16 +50,20 @@ export default function Registration() {
 
     function addSpaceEveryThreeCharacters(str: string) {
         let result = '';
-        
+
         for (let i = 0; i < str.length; i++) {
-          result += str[i];
-          if ((i + 1) % 3 === 0 && i + 1 !== str.length) {
-            result += ' ';
-          }
+            result += str[i];
+            if ((i + 1) % 3 === 0 && i + 1 !== str.length) {
+                result += ' ';
+            }
         }
-        
+
         return result;
-      }
+    }
+
+    function holdPlay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function download() {
         const querySnapshot = await getDocs(collection(db, "registration"));
@@ -81,16 +100,10 @@ export default function Registration() {
                             headers={headers}
                             asyncOnClick={true}
                             onClick={async (event, done) => {
-                                const querySnapshot = await getDocs(collection(db, "registration"));
-                                const data: any = []
-                                querySnapshot.forEach((doc) => {
-                                    data.push({ name: doc.data().name, center: doc.data().center, phone: addSpaceEveryThreeCharacters(doc.data().phone.toString()) })
-                                });
-                                setAttendance(data)
                                 done()
                             }}
                         >
-                            <button className="border font-[600] p-2 rounded-[10px] border-[3px]">Download Attendance</button>
+                            <button disabled={attendance.length < 1} className="border font-[600] p-2 rounded-[10px] border-[3px]">Download Attendance</button>
                         </CSVLink>
                     </main>
                 )
