@@ -25,7 +25,7 @@ export default function Registration() {
             const querySnapshot = await getDocs(collection(db, "registration"));
             const data: any = []
             querySnapshot.forEach((doc) => {
-                data.push({ name: doc.data().name, center: doc.data().center, phone: addSpaceEveryThreeCharacters(doc.data().phone.toString()), email: doc.data().email })
+                data.push({ name: doc.data().name, center: doc.data().center, phone: doc.data().phone, email: doc.data().email })
             });
             // debugger
             setAttendance(data)
